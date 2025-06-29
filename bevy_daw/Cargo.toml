@@ -1,0 +1,13 @@
+[package]
+name = "bevy_daw"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["lib"]
+
+[dependencies]
+bevy = { version = "0.16.1", default-features = false }
+cpal = "0.16.0"
+crossbeam-channel = "0.5.15"
+assert_no_alloc = "1.1.2"

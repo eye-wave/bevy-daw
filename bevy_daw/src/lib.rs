@@ -1,8 +1,16 @@
 use assert_no_alloc::*;
-use bevy::ecs::resource::Resource;
+use bevy::{app::Plugin, ecs::resource::Resource};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use crossbeam_channel::{Receiver, Sender, unbounded};
 use std::cell::RefCell;
+
+pub struct DawPlugin;
+
+impl Plugin for DawPlugin {
+    fn build(&self, app: &mut bevy::app::App) {
+        app.insert_resource(AudioPlayer::new());
+    }
+}
 
 #[cfg(debug_assertions)]
 #[global_allocator]

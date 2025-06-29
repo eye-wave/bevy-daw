@@ -307,10 +307,8 @@ dependencies = [
 name = "bevy-minimal"
 version = "0.1.0"
 dependencies = [
- "assert_no_alloc",
  "bevy",
- "cpal",
- "crossbeam-channel",
+ "bevy_daw",
  "log",
 ]
 
@@ -446,6 +444,16 @@ dependencies = [
  "smallvec",
  "thiserror 2.0.12",
  "tracing",
+]
+
+[[package]]
+name = "bevy_daw"
+version = "0.1.0"
+dependencies = [
+ "assert_no_alloc",
+ "bevy",
+ "cpal",
+ "crossbeam-channel",
 ]
 
 [[package]]
@@ -1379,7 +1387,8 @@ dependencies = [
 [[package]]
 name = "cpal"
 version = "0.16.0"
-source = "git+https://github.com/RustAudio/cpal.git#8a1dbd28b6aed98133ecc31b61144ce1f0d7a6d8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cbd307f43cc2a697e2d1f8bc7a1d824b5269e052209e28883e5bc04d095aaa3f"
 dependencies = [
  "alsa",
  "coreaudio-rs",

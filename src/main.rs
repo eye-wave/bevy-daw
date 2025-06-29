@@ -1,14 +1,12 @@
-use crate::audio::AudioPlayer;
 use bevy::prelude::*;
-
-mod audio;
+use bevy_daw::{AudioPlayer, DawPlugin};
 
 const TAU: f32 = 6.283_185_5;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .insert_resource(AudioPlayer::new())
+        .add_plugins(DawPlugin)
         .add_systems(Startup, play_beep)
         .run();
 }
