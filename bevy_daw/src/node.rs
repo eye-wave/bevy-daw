@@ -1,8 +1,11 @@
-#[derive(Hash, Clone, Copy, PartialEq, Eq)]
-pub struct NodeId(u32);
+use std::{fmt::Debug, u32};
 
-pub const OUTPUT_NODE_ID: NodeId = NodeId(0);
+#[derive(Debug, Hash, Clone, Copy, PartialEq, Eq)]
+pub struct NodeId(pub(crate) u32);
 
+pub const OUTPUT_NODE_ID: NodeId = NodeId(u32::MAX);
+
+#[derive(Debug, PartialEq)]
 pub struct Connection(u64);
 
 impl Connection {
@@ -22,8 +25,9 @@ impl Connection {
     }
 }
 
-pub trait AudioNode: Send {
-    fn process(&mut self, output: &mut [f32]);
+pub trait AudioNode: Send + Sync + Debug + 'static {
+    fn id(&self) -> NodeId;
+    fn process(&mut self, output: &mut [f32], sample_rate: f32);
 }
 
 pub struct NodeIdGenerator {
