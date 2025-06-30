@@ -11,3 +11,5 @@ bevy = { version = "0.16.1", default-features = false }
 cpal = "0.16.0"
 crossbeam-channel = "0.5.15"
 assert_no_alloc = "1.1.2"
+heapless = "0.8.0"
+hashbrown = "0.15.4"
