@@ -1,6 +1,6 @@
 use super::nodes::{DelayNode, GroupNode, ToneGenerator};
 use super::traits::AudioNode;
-use assert_no_alloc::assert_no_alloc;
+use assert_no_alloc::*;
 use bevy::ecs::resource::Resource;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use ringbuf::StaticRb;
@@ -8,6 +8,10 @@ use ringbuf::traits::{Consumer, Producer, Split};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
+
+#[cfg(debug_assertions)]
+#[global_allocator]
+static A: AllocDisabler = AllocDisabler;
 
 pub const SAMPLE_RATE: u32 = 44_100;
 pub const BUFFER_SIZE: usize = 4096;

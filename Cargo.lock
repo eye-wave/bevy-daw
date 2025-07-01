@@ -331,6 +331,7 @@ dependencies = [
 name = "bevy-minimal"
 version = "0.1.0"
 dependencies = [
+ "assert_no_alloc",
  "bevy",
  "bevy_daw",
  "criterion",
