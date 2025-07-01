@@ -9,8 +9,8 @@ pub struct ToneGeneratorNode {
 }
 
 impl ToneGeneratorNode {
-    pub fn new(freq: f32, volume: f32) -> Self {
-        let phase_inc = (freq / SAMPLE_RATE as f32) * TAU;
+    pub fn new<N: Into<f32>>(freq: N, volume: f32) -> Self {
+        let phase_inc = (freq.into() / SAMPLE_RATE as f32) * TAU;
         Self {
             volume,
             phase: 0.0,
