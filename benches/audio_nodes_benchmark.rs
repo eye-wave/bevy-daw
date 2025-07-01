@@ -1,4 +1,5 @@
-use bevy_daw::nodes::{AudioNode, tone::ToneGenerator};
+use bevy_daw::nodes::ToneGenerator;
+use bevy_daw::traits::AudioNode;
 use criterion::{Bencher, Criterion, criterion_group, criterion_main};
 
 const BUFFER_SIZE: usize = 4096;

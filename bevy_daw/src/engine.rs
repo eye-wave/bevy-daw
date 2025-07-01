@@ -1,5 +1,5 @@
-use crate::nodes::AudioNode;
-use crate::nodes::tone::ToneGenerator;
+use super::nodes::{DelayNode, GroupNode, ToneGenerator};
+use super::traits::AudioNode;
 use assert_no_alloc::assert_no_alloc;
 use bevy::ecs::resource::Resource;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -57,13 +57,17 @@ macro_rules! build_stream_match {
 
 impl AudioEngine {
     pub fn new() -> Self {
+        let channel_1 = GroupNode::new()
+            .add_node(ToneGenerator::new(523.25, 0.3)) // C5
+            .add_node(ToneGenerator::new(783.99, 0.3)); // G5
+
+        let channel_2 = GroupNode::new()
+            .add_node(ToneGenerator::new(880.0, 0.3)) // A5
+            .add_node(DelayNode::new(SAMPLE_RATE as usize / 4)); // 0.25 seconds
+
         let state = Arc::new(Mutex::new(EngineState {
             frequency: 440.0,
-            nodes: vec![
-                Box::new(ToneGenerator::new(523.25, 0.3)),
-                Box::new(ToneGenerator::new(783.99, 0.3)),
-                Box::new(ToneGenerator::new(1318.5, 0.3)),
-            ],
+            nodes: vec![Box::new(channel_1), Box::new(channel_2)],
         }));
 
         let state_for_thread = state.clone();

@@ -1,6 +1,7 @@
-use crate::{engine::SAMPLE_RATE, nodes::AudioNode};
+use crate::{engine::SAMPLE_RATE, node::AudioNode};
 use std::f32::consts::TAU;
 
+#[derive(Debug)]
 pub struct ToneGenerator {
     volume: f32,
     phase: f32,
