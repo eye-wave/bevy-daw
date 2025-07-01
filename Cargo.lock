@@ -156,6 +156,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "arc-swap"
+version = "1.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "69f7f8c3906b62b754cd5326047894316021dcfe5a194c8ea52bdd94934a3457"
+
+[[package]]
 name = "arrayref"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -456,6 +462,7 @@ dependencies = [
 name = "bevy_daw"
 version = "0.1.0"
 dependencies = [
+ "arc-swap",
  "assert_no_alloc",
  "bevy",
  "cpal",
@@ -463,6 +470,7 @@ dependencies = [
  "hashbrown",
  "heapless",
  "ringbuf",
+ "triple_buffer",
 ]
 
 [[package]]
@@ -3436,6 +3444,15 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "triple_buffer"
+version = "8.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "420466259f9fa5decc654c490b9ab538400e5420df8237f84ecbe20368bcf72b"
+dependencies = [
+ "crossbeam-utils",
 ]
 
 [[package]]

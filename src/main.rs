@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_daw::{AudioNode, AudioPlayerHandler, DawPlugin, EditorGraph, OUTPUT_NODE, TestTone};
+use bevy_daw::{AudioEngine, DawPlugin};
 
 fn main() {
     App::new()
@@ -9,12 +9,6 @@ fn main() {
         .run();
 }
 
-fn beep(player: Res<AudioPlayerHandler>) {
-    let mut graph = EditorGraph::default();
-    let test_tone = TestTone::new(440.0, 10);
-
-    graph.connect(test_tone.id(), OUTPUT_NODE);
-    graph.add(Box::new(test_tone));
-
-    player.load_graph(graph);
+fn beep(player: Res<AudioEngine>) {
+    player.set_frequency(660.0);
 }
