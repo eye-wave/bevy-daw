@@ -1,4 +1,3 @@
-use super::nodes::{DelayNode, DistortionNode, GroupNode, ToneGeneratorNode};
 use super::traits::AudioNode;
 use assert_no_alloc::*;
 use bevy::ecs::resource::Resource;
@@ -16,14 +15,19 @@ static A: AllocDisabler = AllocDisabler;
 pub const SAMPLE_RATE: u32 = 44_100;
 pub const BUFFER_SIZE: usize = 4096;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct EngineState {
-    pub frequency: f32,
-    nodes: Vec<Box<dyn AudioNode>>,
+    pub nodes: Vec<Box<dyn AudioNode>>,
 }
 
 impl EngineState {
-    pub fn process(&mut self, sample_pos: u32, buf: &mut [f32]) {
+    pub fn new() -> Arc<Mutex<Self>> {
+        Arc::new(Mutex::new(EngineState { nodes: Vec::new() }))
+    }
+}
+
+impl AudioNode for EngineState {
+    fn process(&mut self, sample_pos: u32, buf: &mut [f32]) {
         buf.fill(0.0);
 
         for node in &mut self.nodes {
@@ -61,21 +65,7 @@ macro_rules! build_stream_match {
 
 impl AudioEngine {
     pub fn new() -> Self {
-        let channel_1 = GroupNode::new()
-            .add_node(ToneGeneratorNode::new(523.25, 0.3)) // C5
-            .add_node(ToneGeneratorNode::new(783.99, 0.3)) // G5
-            .add_node(ToneGeneratorNode::new(1318.5, 0.3)) // E6
-            .add_node(DistortionNode::default());
-
-        let channel_2 = GroupNode::new()
-            .add_node(ToneGeneratorNode::new(880.0, 0.3)) // A5
-            .add_node(DelayNode::new(SAMPLE_RATE as usize / 4)); // 0.25 seconds
-
-        let state = Arc::new(Mutex::new(EngineState {
-            frequency: 440.0,
-            nodes: vec![Box::new(channel_1), Box::new(channel_2)],
-        }));
-
+        let state = EngineState::new();
         let state_for_thread = state.clone();
 
         let rb = StaticRb::<f32, BUFFER_SIZE>::from([0.0; BUFFER_SIZE]);
@@ -147,9 +137,12 @@ impl AudioEngine {
         Self { state }
     }
 
-    pub fn set_frequency(&self, freq: f32) {
+    pub fn edit_graph<F>(&self, f: F)
+    where
+        F: FnOnce(&mut EngineState),
+    {
         let mut state = self.state.lock().unwrap();
-        state.frequency = freq;
+        f(&mut state);
     }
 }
 
