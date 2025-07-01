@@ -1,4 +1,4 @@
-use crate::engine::BUFFER_SIZE;
+use crate::engine::MAX_BUFFER_SIZE;
 use crate::node::AudioNode;
 
 #[derive(Debug)]
@@ -12,7 +12,7 @@ impl DelayNode {
     pub fn new(delay_samples: usize) -> Self {
         Self {
             delay_samples,
-            buffer: vec![0.0; delay_samples + BUFFER_SIZE],
+            buffer: vec![0.0; delay_samples + MAX_BUFFER_SIZE],
             write_pos: 0,
         }
     }

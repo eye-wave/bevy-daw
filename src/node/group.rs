@@ -1,15 +1,15 @@
-use crate::{engine::BUFFER_SIZE, node::AudioNode};
+use crate::{engine::MAX_BUFFER_SIZE, node::AudioNode};
 
 #[derive(Debug)]
 pub struct GroupNode {
-    buffer: [f32; BUFFER_SIZE],
+    buffer: [f32; MAX_BUFFER_SIZE],
     nodes: Vec<Box<dyn AudioNode>>,
 }
 
 impl GroupNode {
     pub fn new() -> Self {
         Self {
-            buffer: [0.0; BUFFER_SIZE],
+            buffer: [0.0; MAX_BUFFER_SIZE],
             nodes: Vec::new(),
         }
     }
@@ -28,7 +28,7 @@ impl AudioNode for GroupNode {
         self.buffer.fill(0.0);
 
         for node in &mut self.nodes {
-            node.process(sample_pos, &mut self.buffer);
+            node.process(sample_pos, &mut self.buffer[0..output.len()]);
         }
 
         for (i, sample) in output.iter_mut().enumerate() {

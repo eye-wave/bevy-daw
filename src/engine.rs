@@ -2,8 +2,6 @@ use super::traits::AudioNode;
 use assert_no_alloc::*;
 use bevy::ecs::resource::Resource;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
-use ringbuf::StaticRb;
-use ringbuf::traits::{Consumer, Producer, Split};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
@@ -13,26 +11,30 @@ use std::time::Duration;
 static A: AllocDisabler = AllocDisabler;
 
 pub const SAMPLE_RATE: u32 = 44_100;
-pub const BUFFER_SIZE: usize = 4096;
+pub const MAX_BUFFER_SIZE: usize = 8192;
 
 #[derive(Default, Debug)]
 pub struct EngineState {
     pub nodes: Vec<Box<dyn AudioNode>>,
+    sample_pos: u32,
 }
 
 impl EngineState {
     pub fn new() -> Arc<Mutex<Self>> {
-        Arc::new(Mutex::new(EngineState { nodes: Vec::new() }))
+        Arc::new(Mutex::new(EngineState {
+            sample_pos: 0,
+            nodes: Vec::new(),
+        }))
     }
-}
 
-impl AudioNode for EngineState {
-    fn process(&mut self, sample_pos: u32, buf: &mut [f32]) {
+    fn process(&mut self, buf: &mut [f32]) {
         buf.fill(0.0);
 
         for node in &mut self.nodes {
-            node.process(sample_pos, buf);
+            node.process(self.sample_pos, buf);
         }
+
+        self.sample_pos += buf.len() as u32;
     }
 }
 
@@ -42,17 +44,26 @@ pub struct AudioEngine {
 }
 
 macro_rules! build_stream_match {
-    ($device:expr, $config:expr, $consumer:expr, $err_fn:expr, { $( $fmt:path => $ty:ty ),* $(,)? }) => {
+    ($device:expr, $config:expr, $state:expr,$err_fn:expr, { $( $fmt:path => $ty:ty ),* $(,)? }) => {
         match $device.default_output_config().unwrap().sample_format() {
             $(
                 $fmt => $device.build_output_stream(
                     $config,
                     move |data: &mut [$ty], _| {
                         assert_no_alloc(|| {
-                            for sample in data.iter_mut() {
-                                *sample = resample($consumer.try_pop().unwrap_or(0.0));
+                            let buf = &mut [0.0f32; MAX_BUFFER_SIZE];
+                            let mut processed = false;
+
+                            if let Ok(mut state) = $state.try_lock() {
+                                state.process(&mut buf[..data.len()]);
+                                processed = true;
                             }
-                        })
+
+                            for i in 0..data.len() {
+                                let sample = if processed { buf[i] } else { 0.0 };
+                                data[i] = resample(sample);
+                            }
+                        });
                     },
                     $err_fn,
                     None,
@@ -68,9 +79,6 @@ impl AudioEngine {
         let state = EngineState::new();
         let state_for_thread = state.clone();
 
-        let rb = StaticRb::<f32, BUFFER_SIZE>::from([0.0; BUFFER_SIZE]);
-        let (mut producer, mut consumer) = rb.split();
-
         // Setup audio output
         let host = cpal::default_host();
         let device = host.default_output_device().expect("No output device");
@@ -84,7 +92,7 @@ impl AudioEngine {
         let stream = build_stream_match!(
             device,
             &config,
-            consumer,
+            state_for_thread,
             |err| eprintln!("{err}"),
             {
                 cpal::SampleFormat::F32 => f32,
@@ -97,36 +105,10 @@ impl AudioEngine {
             }
         )
         .expect("Failed to build output stream");
-        // Producer
-        let prod = thread::spawn(move || {
-            assert_no_alloc(|| {
-                let mut sample_pos = 0;
-                let mut buf = [0.0f32; BUFFER_SIZE];
-
-                loop {
-                    {
-                        let mut state = state_for_thread.lock().unwrap();
-
-                        state.process(sample_pos, &mut buf);
-                        sample_pos += BUFFER_SIZE as u32;
-                    }
-
-                    let mut written = 0;
-                    while written < buf.len() {
-                        if producer.try_push(buf[written]).is_ok() {
-                            written += 1;
-                        } else {
-                            thread::yield_now();
-                        }
-                    }
-                }
-            });
-        });
 
         stream.play().unwrap();
 
         thread::spawn(|| {
-            let _prod = prod;
             let _stream = stream;
 
             loop {
