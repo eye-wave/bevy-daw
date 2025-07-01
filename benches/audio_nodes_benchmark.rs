@@ -1,5 +1,5 @@
 use assert_no_alloc::*;
-use bevy_daw::nodes::{DelayNode, ToneGenerator};
+use bevy_daw::nodes::{DelayNode, DistortionNode, DistortionType, GainNode, ToneGeneratorNode};
 use bevy_daw::traits::AudioNode;
 use criterion::{Bencher, Criterion, criterion_group, criterion_main};
 
@@ -33,6 +33,10 @@ macro_rules! bench_nodes_group {
 }
 
 bench_nodes_group!(benches, [
-    tone_generator_bench => (ToneGenerator, 440.0, 0.5),
+    tone_generator_bench => (ToneGeneratorNode, 440.0, 0.5),
     delay_generator_bench => (DelayNode, 11025),
+    dist_soft_clip_bench => (DistortionNode,4.0,0.5,DistortionType::SoftClip),
+    dist_hard_clip_bench => (DistortionNode,4.0,0.5,DistortionType::HardClip),
+    dist_sine_warp_bench => (DistortionNode,4.0,0.5,DistortionType::SineWarp),
+    gain_bench => (GainNode,3.0),
 ]);

@@ -2,13 +2,13 @@ use crate::{engine::SAMPLE_RATE, node::AudioNode};
 use std::f32::consts::TAU;
 
 #[derive(Debug)]
-pub struct ToneGenerator {
+pub struct ToneGeneratorNode {
     volume: f32,
     phase: f32,
     phase_inc: f32,
 }
 
-impl ToneGenerator {
+impl ToneGeneratorNode {
     pub fn new(freq: f32, volume: f32) -> Self {
         let phase_inc = (freq / SAMPLE_RATE as f32) * TAU;
         Self {
@@ -19,7 +19,7 @@ impl ToneGenerator {
     }
 }
 
-impl AudioNode for ToneGenerator {
+impl AudioNode for ToneGeneratorNode {
     fn process(&mut self, _sample_pos: u32, output: &mut [f32]) {
         for sample in output.iter_mut() {
             *sample += self.phase.sin() * self.volume;

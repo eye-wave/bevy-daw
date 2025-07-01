@@ -1,4 +1,4 @@
-use super::nodes::{DelayNode, GroupNode, ToneGenerator};
+use super::nodes::{DelayNode, DistortionNode, GroupNode, ToneGeneratorNode};
 use super::traits::AudioNode;
 use assert_no_alloc::*;
 use bevy::ecs::resource::Resource;
@@ -62,11 +62,13 @@ macro_rules! build_stream_match {
 impl AudioEngine {
     pub fn new() -> Self {
         let channel_1 = GroupNode::new()
-            .add_node(ToneGenerator::new(523.25, 0.3)) // C5
-            .add_node(ToneGenerator::new(783.99, 0.3)); // G5
+            .add_node(ToneGeneratorNode::new(523.25, 0.3)) // C5
+            .add_node(ToneGeneratorNode::new(783.99, 0.3)) // G5
+            .add_node(ToneGeneratorNode::new(1318.5, 0.3)) // E6
+            .add_node(DistortionNode::default());
 
         let channel_2 = GroupNode::new()
-            .add_node(ToneGenerator::new(880.0, 0.3)) // A5
+            .add_node(ToneGeneratorNode::new(880.0, 0.3)) // A5
             .add_node(DelayNode::new(SAMPLE_RATE as usize / 4)); // 0.25 seconds
 
         let state = Arc::new(Mutex::new(EngineState {
