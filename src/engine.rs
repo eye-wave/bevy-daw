@@ -86,12 +86,15 @@ impl AudioEngine {
             .supported_output_configs()
             .expect("Error getting configs");
 
-        let config = pick_config(&mut supported_configs).unwrap().into();
+        let config = pick_config(&mut supported_configs);
+        if config.is_none() {
+            return Self { state };
+        }
 
         // Consumer
         let stream = build_stream_match!(
             device,
-            &config,
+            &config.unwrap().into(),
             state_for_thread,
             |err| eprintln!("{err}"),
             {
