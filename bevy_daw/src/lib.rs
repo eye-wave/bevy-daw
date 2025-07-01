@@ -1,7 +1,7 @@
 use bevy::app::Plugin;
 
 mod engine;
-mod nodes;
+pub mod nodes;
 
 pub struct DawPlugin;
 pub use engine::AudioEngine;

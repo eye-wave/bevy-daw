@@ -41,3 +41,10 @@ rustflags = ["-Cdebuginfo=0", "-Zthreads=8", "-Zshare-generics=y"]
 [workspace]
 resolver = "3"
 members = ["bevy_daw"]
+
+[dev-dependencies]
+criterion = { version = "0.6.0", features = ["html_reports"] }
+
+[[bench]]
+harness = false
+name = "audio_nodes_benchmark"
