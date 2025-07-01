@@ -1,30 +1,31 @@
 cargo-features = ["profile-rustflags", "trim-paths"]
 
 [package]
-name = "bevy-minimal"
+name = "bevy_daw"
 version = "0.1.0"
 edition = "2024"
 
-[dependencies]
-bevy_daw = { path = "./bevy_daw" }
-log = { version = "*", features = [
-    "max_level_debug",
-    "release_max_level_warn",
-] }
+[lib]
+crate-type = ["lib"]
 
-[dependencies.bevy]
-version = "0.16.1"
-default-features = false
-features = [
-    "dynamic_linking",
-    "bevy_render",
-    "bevy_core_pipeline",
-    "bevy_sprite",
-    "x11",
-    "bevy_winit",
-    "bevy_asset",
-    "png",
-]
+[dependencies]
+arc-swap = "1.7.1"
+assert_no_alloc = "1.1.2"
+bevy = { version = "0.16.1", default-features = false }
+cpal = "0.16.0"
+crossbeam-channel = "0.5.15"
+hashbrown = "0.15.4"
+heapless = "0.8.0"
+ringbuf = "0.4.8"
+
+
+[dev-dependencies]
+assert_no_alloc = "1.1.2"
+criterion = { version = "0.6.0", features = ["html_reports"] }
+
+[[bench]]
+harness = false
+name = "audio_nodes_benchmark"
 
 [profile.dev.package."*"]
 opt-level = 3
@@ -37,15 +38,3 @@ panic = "unwind"
 strip = true
 trim-paths = "all"
 rustflags = ["-Cdebuginfo=0", "-Zthreads=8", "-Zshare-generics=y"]
-
-[workspace]
-resolver = "3"
-members = ["bevy_daw"]
-
-[dev-dependencies]
-assert_no_alloc = "1.1.2"
-criterion = { version = "0.6.0", features = ["html_reports"] }
-
-[[bench]]
-harness = false
-name = "audio_nodes_benchmark"
