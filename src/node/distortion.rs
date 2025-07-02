@@ -50,3 +50,35 @@ impl Default for DistortionNode {
         Self::new(1.0, 1.0, DistortionType::HardClip)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::{AudioNode, DistortionNode, DistortionType};
+    use crate::engine::SAMPLE_RATE;
+    use crate::node::nodes::ToneGeneratorNode;
+    use crate::node::test_utils::test::*;
+
+    #[test]
+    fn plot_tone_generator() {
+        let freq = SAMPLE_RATE as f32 / 2048.0;
+        let mut tone = ToneGeneratorNode::new(freq * 2.0, 0.5);
+        let mut dist = DistortionNode::new(10.0, 1.0, DistortionType::HardClip);
+
+        let modes = [
+            (DistortionType::HardClip, "hardclip"),
+            (DistortionType::SineWarp, "sinewarp"),
+            (DistortionType::SoftClip, "softclip"),
+        ];
+
+        for (mode, name) in modes {
+            let mut buffer = [0.0; 2048];
+
+            dist.mode = mode;
+
+            tone.process(0, &mut buffer);
+            dist.process(0, &mut buffer);
+
+            node_test_suite(&buffer, 1024, &format!("dist-{name}"));
+        }
+    }
+}

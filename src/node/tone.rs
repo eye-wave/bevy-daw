@@ -31,3 +31,24 @@ impl AudioNode for ToneGeneratorNode {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::{AudioNode, ToneGeneratorNode};
+    use crate::engine::SAMPLE_RATE;
+    use crate::node::test_utils::test::*;
+
+    #[test]
+    fn plot_tone_generator() {
+        let freq = SAMPLE_RATE as f32 / 2048.0;
+        let mut tone1 = ToneGeneratorNode::new(freq * 2.0, 0.5);
+        let mut tone2 = ToneGeneratorNode::new(freq * 3.0, 0.5);
+
+        let mut buffer = [0.0; 2048];
+
+        tone1.process(0, &mut buffer);
+        tone2.process(0, &mut buffer);
+
+        node_test_suite(&buffer, 1024, "tone-generator");
+    }
+}

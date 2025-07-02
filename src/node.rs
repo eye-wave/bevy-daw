@@ -6,6 +6,9 @@ mod gain;
 mod group;
 mod tone;
 
+#[cfg(test)]
+mod test_utils;
+
 pub trait AudioNode: Send + Debug {
     fn process(&mut self, sample_pos: u32, output: &mut [f32]);
 }
