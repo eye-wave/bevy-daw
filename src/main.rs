@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_daw::{
-    AudioEngine, DawPlugin, MidiNote,
+    AudioEngine, DawPlugin,
     nodes::{DistortionNode, DistortionType, GroupNode, ToneGeneratorNode},
 };
 
@@ -12,14 +12,10 @@ fn main() {
         .run();
 }
 
-fn play_something(player: Res<AudioEngine>) {
-    player.edit_graph(|graph| {
-        let group = GroupNode::new()
-            .add_node(ToneGeneratorNode::new(MidiNote::new(60), 0.3))
-            .add_node(DistortionNode::new(10.0, 0.4, DistortionType::SoftClip))
-            .add_node(ToneGeneratorNode::new(MidiNote::new(65), 0.2))
-            .add_node(ToneGeneratorNode::new(MidiNote::new(68), 0.2));
+fn play_something(mut player: ResMut<AudioEngine>) {
+    let group = GroupNode::new()
+        .add_node(ToneGeneratorNode::new(440.0, 1.0))
+        .add_node(DistortionNode::new(10.0, 0.2, DistortionType::SoftClip));
 
-        graph.nodes.push(Box::new(group));
-    });
+    player.add_node(Box::new(group));
 }
