@@ -9,6 +9,9 @@ mod tone;
 #[cfg(test)]
 mod test_utils;
 
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub struct NodeId(pub(crate) u32);
+
 pub trait AudioNode: Debug + Send + Sync {
     fn process(&mut self, sample_pos: u32, output: &mut [f32]);
 }

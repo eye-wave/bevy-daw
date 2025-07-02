@@ -12,7 +12,7 @@ crate-type = ["lib"]
 assert_no_alloc = "1.1.2"
 bevy = { version = "0.16.1", default-features = false }
 cpal = "0.16.0"
-crossbeam-channel = "0.5.15"
+hashbrown = "0.15.4"
 heapless = "0.8.0"
 spin = "0.10.0"
 

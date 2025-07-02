@@ -1,8 +1,9 @@
 use super::SAMPLE_RATE;
-use crate::AudioEngine;
+use crate::AudioController;
 use crate::engine::{AUDIO_STATE, MAX_BUFFER_SIZE};
 use assert_no_alloc::*;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+use hashbrown::HashMap;
 use std::thread;
 use std::time::Duration;
 
@@ -48,7 +49,7 @@ macro_rules! build_stream_match {
     };
 }
 
-impl AudioEngine {
+impl AudioController {
     pub fn new() -> Self {
         let host = cpal::default_host();
         let device = host.default_output_device().expect("No output device");
@@ -58,7 +59,9 @@ impl AudioEngine {
 
         let config = pick_config(&mut supported_configs);
         if config.is_none() {
-            return Self {};
+            return Self {
+                ..Default::default()
+            };
         }
 
         let stream = build_stream_match!(
@@ -89,13 +92,18 @@ impl AudioEngine {
             }
         });
 
-        Self {}
+        Self {
+            ..Default::default()
+        }
     }
 }
 
-impl Default for AudioEngine {
+impl Default for AudioController {
     fn default() -> Self {
-        Self::new()
+        Self {
+            next_id: 0,
+            nodes: HashMap::new(),
+        }
     }
 }
 
